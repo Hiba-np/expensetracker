@@ -42,6 +42,7 @@ from rest_framework.authentication import BasicAuthentication,TokenAuthenticatio
 from rest_framework.permissions import IsAuthenticated ,AllowAny
 from django.utils import timezone
 from django.db.models import Sum
+from expense.permissions import isOwner
 # Create your views here
 
 class SignUpViewset(ViewSet):
@@ -54,7 +55,8 @@ class SignUpViewset(ViewSet):
     
 class ExpenseView(ViewSet):
     authentication_classes=[TokenAuthentication]
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
+    permission_classes=[isOwner]
     def create(self,request):
         dser=ExpenseSerializer(data=request.data)
         if dser.is_valid():
@@ -96,7 +98,8 @@ class ExpenseView(ViewSet):
 
 class ExpenseSummeryView(APIView):
     authentication_classes=[TokenAuthentication]
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
+    permission_classes=[isOwner]
     def get(self,request,**kwargs):
         cur_date=timezone.now()
         cur_month=cur_date.month
@@ -107,11 +110,14 @@ class ExpenseSummeryView(APIView):
         cat_summary=[summary for summary in category_summary]
         for i in category_summary:
             print(i)
-        total_expenses=data.values('category').annotate(sum('amount'))
+        print(cat_summary) 
+        total_expenses=data.values('category').annotate(Sum('amount'))
         print(total_expenses)
         context={
             "total_expense":total_expenses,
             "category_summary" :cat_summary      }
         return Response (data=context)
+
+    
 
             

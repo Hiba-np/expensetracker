@@ -9,6 +9,7 @@ class UserSerializer(serializers.Serializer):
     password=serializers.CharField()
 
 
+
 # class  UserSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model=User
@@ -20,8 +21,15 @@ class UserSerializer(serializers.Serializer):
     
 
 class ExpenseSerializer(serializers.ModelSerializer):
+     # owner=serializers.StringRelatedField(read_only=True)
+
+    greeting=serializers.SerializerMethodField()
+    owner=serializers.SerializerMethodField()
     class Meta:
         model=Expenses
         fields='__all__'
         read_only_fields=['id','created_at','owner']
-        
+    def get_greeting(self,obj):
+                return " Hi Welcome to expense tracker"
+    def get_owner(self,obj):
+                return obj.owner.username
